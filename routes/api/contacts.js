@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const { validateBody, isValidId } = require("../../middlewares");
-const { schemas } = require("../../models/contact");
+const {validateBody, isValidId, authenticate} = require('../../middlewares');
+const {schemas} = require('../../models/contact');
 
 const {
   getAllContacts,
@@ -11,22 +11,24 @@ const {
   deleteContact,
   updateContact,
   updateStatusContact,
-} = require("../../controllers/contacts");
+} = require('../../controllers/contacts');
 
-router.get("/", getAllContacts);
-router.get("/:contactId", isValidId, getContact);
-router.post("/", validateBody(schemas.addSchema), postContact);
-router.delete("/:contactId", isValidId, deleteContact);
+router.get('/', authenticate, getAllContacts);
+router.get('/:contactId', authenticate, isValidId, getContact);
+router.post('/', authenticate, validateBody(schemas.addSchema), postContact);
+router.delete('/:contactId', authenticate, isValidId, deleteContact);
 router.put(
-  "/:contactId",
+  '/:contactId',
+  authenticate,
   isValidId,
   validateBody(schemas.addSchema),
   updateContact
 );
 router.patch(
-  "/:contactId/favorite",
+  '/:contactId/favorite',
+  authenticate,
   isValidId,
-  validateBody(schemas.updateFavoriteSchema, "Missing field favorite"),
+  validateBody(schemas.updateFavoriteSchema, 'Missing field favorite'),
   updateStatusContact
 );
 

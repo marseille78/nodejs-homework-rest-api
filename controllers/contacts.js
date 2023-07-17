@@ -1,62 +1,64 @@
-const { ctrlTryCatchWrapper, HttpError } = require("../helpers");
+const {ctrlTryCatchWrapper, HttpError} = require('../helpers');
 
-const { Contact } = require("../models/contact");
+const {Contact} = require('../models/contact');
 
 const getAllContacts = async (req, res, next) => {
-  const result = await Contact.find({}, "-createdAt -updatedAt");
+  const {_id: owner} = req.user;
+  const result = await Contact.find({owner}, '-createdAt -updatedAt').populate('owner', 'email subscription');
   res.json(result);
 };
 
 const getContact = async (req, res, next) => {
-  const { contactId } = req.params;
+  const {contactId} = req.params;
   const result = await Contact.findById(contactId);
 
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, 'Not found');
   }
 
   res.json(result);
 };
 
 const postContact = async (req, res, next) => {
-  const result = await Contact.create(req.body);
+  const {_id: owner} = req.user;
+  const result = await Contact.create({...req.body, owner});
   res.status(201).json(result);
 };
 
 const deleteContact = async (req, res, next) => {
-  const { contactId } = req.params;
+  const {contactId} = req.params;
   const result = await Contact.findByIdAndDelete(contactId);
 
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, 'Not found');
   }
 
   res.json({
-    message: "Contact deleted",
+    message: 'Contact deleted',
   });
 };
 
 const updateContact = async (req, res, next) => {
-  const { contactId } = req.params;
+  const {contactId} = req.params;
   const result = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
 
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, 'Not found');
   }
 
   res.json(result);
 };
 
 const updateStatusContact = async (req, res, next) => {
-  const { contactId } = req.params;
+  const {contactId} = req.params;
   const result = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
 
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, 'Not found');
   }
 
   res.json(result);
